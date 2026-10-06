@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "createdAt": "2026-10-06T13:11:47Z",
+  "release": 3,
+  "tool": "playwright-test-governed-healer agent",
+  "model": "claude-sonnet-5.5",
+  "entries": [
+    {
+      "test": "tests/transfers.spec.ts:71 > Authentication, dashboard, and domestic transfers: domestic transfers > Fee and total are correct for a 15,000 HUF transfer",
+      "file": "tests/transfers.spec.ts",
+      "error": "expect(locator).toHaveText(expected) failed: expected \"200 HUF\", received \"450 HUF\"",
+      "classification": "UNSURE",
+      "reason": "Release 3 is active. The plan describes the 200 HUF fee as the observed Release 2 example and otherwise says fees are release-dependent; it does not specify the expected Release 3 fee. A person should confirm the Release 3 tariff before classifying the observed 450 HUF as a bug.",
+      "change": "No test change. The expected Release 3 fee is not documented sufficiently to classify as BUG or DRIFT.",
+      "expectedValueChanged": false,
+      "expected": "Release-dependent fee; the plan documents 200 HUF only for the Release 2 example",
+      "observed": "450 HUF (total 15,450 HUF)",
+      "tracePath": "test-results/tests-transfers-Authentica-b1077-t-for-a-15-000-HUF-transfer-chromium/trace.zip",
+      "model": "claude-sonnet-5.5",
+      "tool": "playwright-test-governed-healer agent"
+    }
+  ]
+}
