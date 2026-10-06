@@ -11,8 +11,8 @@ test.describe('Authentication, dashboard, and domestic transfers: dashboard', ()
 
     // Account loading has a variable delay that can exceed the default assertion timeout.
     await expect(page.getByText('Loading accounts...')).toBeHidden({ timeout: 20_000 });
-    await expect(page.getByRole('heading', { level: 2, name: 'Everyday Account' })).toBeVisible();
-    await expect(page.getByRole('heading', { level: 2, name: 'Savings Account' })).toBeVisible();
+    await expect(page.getByText('Everyday Account', { exact: true })).toBeVisible();
+    await expect(page.getByText('Savings Account', { exact: true })).toBeVisible();
     await expect(page.getByText('1,250,000 HUF')).toBeVisible();
     await expect(page.getByText('5,400,000 HUF')).toBeVisible();
     await expect(page.getByText(/^HU\d{2}( \d{4}){6}$/)).toHaveCount(2);

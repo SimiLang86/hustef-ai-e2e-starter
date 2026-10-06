@@ -5,11 +5,17 @@ import { test, expect } from './fixtures';
 import { signIn } from './pages/sign-in-page';
 import type { Page } from '@playwright/test';
 
+// Release 1 labels the submit button "Continue" and the reference field "Reference";
+// Release 2 uses "Review transfer" and "Payment reference".
+function continueButton(page: Page) {
+  return page.getByRole('button', { name: /^(Continue|Review transfer)$/ });
+}
+
 async function prepareTransferToKissPeter(page: Page, amount: string) {
   await page.goto('/transfer');
   await page.getByRole('button', { name: 'Use Kiss Péter' }).click();
   await page.getByLabel('Amount (HUF)').fill(amount);
-  await page.getByLabel('Reference').fill('Lab 1');
+  await page.getByLabel(/^(Payment reference|Reference)$/).fill('Lab 1');
 }
 
 function reviewValue(page: Page, rowHeader: string) {
@@ -27,7 +33,7 @@ test.describe('Authentication, dashboard, and domestic transfers: domestic trans
     await signIn(page);
     await prepareTransferToKissPeter(page, '15000');
     await page.getByRole('button', { name: 'Check IBAN' }).click();
-    await page.getByRole('button', { name: 'Continue' }).click();
+    await continueButton(page).click();
 
     await expect(page).toHaveURL(/\/transfer\/review$/);
     await expect(reviewValue(page, 'From')).toHaveText('Everyday Account');
@@ -36,17 +42,17 @@ test.describe('Authentication, dashboard, and domestic transfers: domestic trans
     await expect(reviewValue(page, 'Amount')).toHaveText('15,000 HUF');
     await expect(reviewValue(page, 'Fee')).toHaveText('200 HUF');
     await expect(reviewValue(page, 'Total')).toHaveText('15,200 HUF');
-    await page.getByRole('button', { name: 'Confirm transfer' }).click();
+    await page.getByRole('button', { name: /^(Confirm transfer|Send money)$/ }).click();
   });
 
   test('Required transfer details are enforced', async ({ page }) => {
     // 1. Open New transfer and submit with all details blank.
     await signIn(page);
     await page.goto('/transfer');
-    await page.getByRole('button', { name: 'Continue' }).click();
+    await continueButton(page).click();
 
     await expect(page).toHaveURL(/\/transfer$/);
-    await expect(page.getByText('Enter a beneficiary name.')).toBeVisible();
+    await expect(page.getByText(/^Enter a (beneficiary|payee) name\.$/)).toBeVisible();
     await expect(page.getByText('Check the IBAN first.')).toBeVisible();
     await expect(page.getByText('Enter an amount greater than 0.')).toBeVisible();
   });
@@ -55,7 +61,7 @@ test.describe('Authentication, dashboard, and domestic transfers: domestic trans
     // 1. Use a saved payee with a valid amount but do not activate Check IBAN.
     await signIn(page);
     await prepareTransferToKissPeter(page, '15000');
-    await page.getByRole('button', { name: 'Continue' }).click();
+    await continueButton(page).click();
 
     await expect(page.getByText('Check the IBAN first.')).toBeVisible();
     await expect(page).toHaveURL(/\/transfer$/);
@@ -67,7 +73,7 @@ test.describe('Authentication, dashboard, and domestic transfers: domestic trans
       await signIn(page);
       await prepareTransferToKissPeter(page, String(amount));
       await page.getByRole('button', { name: 'Check IBAN' }).click();
-      await page.getByRole('button', { name: 'Continue' }).click();
+      await continueButton(page).click();
 
       await expect(reviewValue(page, 'Amount')).toHaveText(`${amount.toLocaleString('en-US')} HUF`);
       const fee = reviewValue(page, 'Fee');
